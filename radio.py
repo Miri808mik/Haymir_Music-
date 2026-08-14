@@ -1,13 +1,13 @@
 """
 Simple Radio Streaming Server
 ------------------------------
-Streams a folder of mp3 files back-to-back on a loop, like a basic radio
-station. Point any audio player (browser, VLC, phone) at the /stream URL
-and it will keep playing songs one after another, forever.
+Streams the mp3 files inside the songs/ folder back-to-back on a loop,
+like a real radio station. Everyone who connects to /stream hears the
+exact same audio at the exact same moment, live.
 
 Deploy this on Render as a "Web Service":
     - Build command: pip install -r requirements.txt
-    - Start command: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 120 radio:app
+    - Start command: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 16 --timeout 120 radio:app
 """
 
 import os
@@ -43,9 +43,9 @@ def generate_stream():
             while chunk := f.read(CHUNK_SIZE):
                 yield chunk
                 # Pace output to match real playback speed instead of
-                # dumping the whole file instantly. This is what keeps
-                # CPU usage low and prevents the server from locking up
-                # under Render's free-tier CPU limits.
+                # dumping the whole file instantly. This keeps CPU usage
+                # low (won't lock up the free-tier instance) and is also
+                # what makes every listener hear the same moment together.
                 time.sleep(len(chunk) / BYTES_PER_SECOND)
         i += 1
 
@@ -54,7 +54,7 @@ def generate_stream():
 def stream():
     response = Response(generate_stream(), mimetype="audio/mpeg")
     response.headers["Cache-Control"] = "no-cache, no-store"
-    response.headers["X-Accel-Buffering"] = "no"  # tell proxies not to buffer
+    response.headers["X-Accel-Buffering"] = "no"
     response.headers["Connection"] = "keep-alive"
     return response
 
