@@ -2,7 +2,6 @@
 # Lines starting with # are ignored.
 #
 # Example (delete these and put your real links):
-https://irsv.upmusics.com/dlw/Del%20To%20Mitunest%20Bere%20Vali%20Khob%20(320).mp3
 https://github.com/Miri808mik/Haymir_Music-/raw/refs/heads/main/Del%20To%20Mitunest%20Bere%20Vali%20Khob%20(320).mp3
 #
 # Tip: to edit this file on GitHub without uploading anything -
