@@ -2,8 +2,8 @@
 # Lines starting with # are ignored.
 #
 # Example (delete these and put your real links):
-# https://example.com/song1.mp3
-# https://example.com/song2.mp3
+# https://irsv.upmusics.com/dlw/Del%20To%20Mitunest%20Bere%20Vali%20Khob%20(320).mp3
+# 
 #
 # Tip: to edit this file on GitHub without uploading anything -
 # open the file on github.com, click the pencil (edit) icon,
