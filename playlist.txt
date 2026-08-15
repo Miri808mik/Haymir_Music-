@@ -1,0 +1,10 @@
+# Add one direct mp3 link per line below.
+# Lines starting with # are ignored.
+#
+# Example (delete these and put your real links):
+# https://example.com/song1.mp3
+# https://example.com/song2.mp3
+#
+# Tip: to edit this file on GitHub without uploading anything -
+# open the file on github.com, click the pencil (edit) icon,
+# add/remove a line, and click "Commit changes". That's it.
