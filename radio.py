@@ -3,7 +3,8 @@ Simple Radio Streaming Server
 ------------------------------
 Streams the mp3 files inside the songs/ folder back-to-back on a loop,
 like a real radio station. Everyone who connects to /stream hears the
-exact same audio at the exact same moment, live.
+exact same audio at the exact same moment, live — new listeners join
+wherever the broadcast currently is, they don't restart from track 1.
 
 Deploy this on Render as a "Web Service":
     - Build command: pip install -r requirements.txt
@@ -20,11 +21,12 @@ app = Flask(__name__)
 SONGS_DIR = os.path.join(os.path.dirname(__file__), "songs")
 CHUNK_SIZE = 4096
 
-# Target bitrate used to pace the stream at real playback speed.
-# 128 kbps is a standard mp3 bitrate. If your files use a different
-# bitrate, adjust this (or set the BITRATE_KBPS env var) for accurate pacing.
 BITRATE_KBPS = int(os.environ.get("BITRATE_KBPS", 128))
 BYTES_PER_SECOND = (BITRATE_KBPS * 1000) // 8
+
+# The moment the server started broadcasting. Every listener's position
+# is computed relative to this, so everyone stays in sync.
+BROADCAST_START = time.time()
 
 
 def get_playlist():
@@ -34,20 +36,38 @@ def get_playlist():
     return files
 
 
-def generate_stream():
+def get_playhead():
+    """Figure out which song is 'currently playing' and how far into it
+    we are, based on real elapsed time since the broadcast started."""
     playlist = get_playlist()
-    i = 0
+    durations = [os.path.getsize(f) / BYTES_PER_SECOND for f in playlist]
+    total_duration = sum(durations)
+
+    elapsed = (time.time() - BROADCAST_START) % total_duration
+
+    cursor = 0.0
+    for idx, dur in enumerate(durations):
+        if elapsed < cursor + dur:
+            return playlist, idx, elapsed - cursor
+        cursor += dur
+    return playlist, 0, 0.0  # fallback
+
+
+def generate_stream():
+    playlist, idx, offset_seconds = get_playhead()
+    byte_offset = int(offset_seconds * BYTES_PER_SECOND)
+
     while True:  # loop forever, like a real radio station
-        filepath = playlist[i % len(playlist)]
+        filepath = playlist[idx % len(playlist)]
         with open(filepath, "rb") as f:
+            f.seek(byte_offset)
             while chunk := f.read(CHUNK_SIZE):
                 yield chunk
-                # Pace output to match real playback speed instead of
-                # dumping the whole file instantly. This keeps CPU usage
-                # low (won't lock up the free-tier instance) and is also
-                # what makes every listener hear the same moment together.
+                # Pace output to match real playback speed. This keeps
+                # CPU usage low AND keeps every listener in sync.
                 time.sleep(len(chunk) / BYTES_PER_SECOND)
-        i += 1
+        idx += 1
+        byte_offset = 0  # start next song from the beginning
 
 
 @app.route("/stream")
