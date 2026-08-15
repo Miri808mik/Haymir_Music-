@@ -3,7 +3,7 @@
 #
 # Example (delete these and put your real links):
 https://github.com/Miri808mik/Haymir_Music-/raw/refs/heads/main/Del%20To%20Mitunest%20Bere%20Vali%20Khob%20(320).mp3
-#
+https://dl.rozmusic.com/Music/1403/11/29/Novan%20-%20Bi%20To%20Har%20Shab%20%28128%29.mp3
 # Tip: to edit this file on GitHub without uploading anything -
 # open the file on github.com, click the pencil (edit) icon,
 # add/remove a line, and click "Commit changes". That's it.
